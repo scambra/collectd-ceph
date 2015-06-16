@@ -39,6 +39,12 @@ Find below a list of the available plugins and the metrics they publish.
   * ceph-&lt;cluster>.cluster.gauge.total_avail (cluster space available)
   * ceph-&lt;cluster>.cluster.gauge.total_space (cluster total raw space)
   * ceph-&lt;cluster>.cluster.gauge.total_used (cluster raw space used)
+  * ceph-&lt;cluster>.cluster.gauge.read_bytes_sec (cluster read bytes/sec)
+  * ceph-&lt;cluster>.cluster.gauge.write_bytes_sec (cluster write bytes/sec)
+  * ceph-&lt;cluster>.cluster.gauge.op_per_sec (cluster iops)
+  * ceph-&lt;cluster>.cluster.gauge.recovering_objects (cluster recovering objects/sec)
+  * ceph-&lt;cluster>.cluster.gauge.recovering_bytes (cluster recovering bytes/sec)
+  * ceph-&lt;cluster>.cluster.gauge.slow_requests (cluster blocked requests for longer than 32 sec)
 * ceph_pg_plugin
   * ceph-&lt;cluster>.pg.gauge.&lt;state> (number of pgs in &lt;state>)
   * ceph-&lt;cluster>.osd-&lt;id>.gauge.fs_commit_latency (fs commit latency for osd)
