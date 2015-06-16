@@ -51,8 +51,8 @@ class CephPoolPlugin(base.Base):
 
         stats_output = None
         try:
-            stats_output = subprocess.check_output('ceph osd pool stats -f json', shell=True)
-            df_output = subprocess.check_output('ceph df -f json', shell=True)
+            stats_output = subprocess.check_output('ceph --cluster %s osd pool stats -f json' % (self.cluster), shell=True)
+            df_output = subprocess.check_output('ceph --cluster %s df -f json' % (self.cluster), shell=True)
         except Exception as exc:
             collectd.error("ceph-pool: failed to ceph pool stats :: %s :: %s"
                     % (exc, traceback.format_exc()))
@@ -71,7 +71,7 @@ class CephPoolPlugin(base.Base):
         for pool in json_stats_data:
             pool_key = "pool-%s" % pool['pool_name']
             data[ceph_cluster][pool_key] = {}
-            pool_data = data[ceph_cluster][pool_key] 
+            pool_data = data[ceph_cluster][pool_key]
             for stat in ('read_bytes_sec', 'write_bytes_sec', 'op_per_sec'):
                 pool_data[stat] = pool['client_io_rate'][stat] if pool['client_io_rate'].has_key(stat) else 0
 

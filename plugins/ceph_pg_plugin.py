@@ -49,8 +49,8 @@ class CephPGPlugin(base.Base):
         data = { ceph_cluster: { 'pg': { } }  }
         output = None
         try:
-            output = subprocess.check_output('ceph pg dump --format json', shell=True)
-            status_output = subprocess.check_output('ceph status --format json', shell=True)
+            output = subprocess.check_output('ceph --cluster %s pg dump --format json' % (self.cluster), shell=True)
+            status_output = subprocess.check_output('ceph --cluster %s status --format json' % (self.cluster), shell=True)
         except Exception as exc:
             collectd.error("ceph-pg: failed to ceph pg dump :: %s :: %s"
                     % (exc, traceback.format_exc()))

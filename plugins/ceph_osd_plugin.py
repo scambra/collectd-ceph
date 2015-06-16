@@ -47,13 +47,13 @@ class CephOsdPlugin(base.Base):
 
         ceph_cluster = "%s-%s" % (self.prefix, self.cluster)
 
-        data = { ceph_cluster: { 
+        data = { ceph_cluster: {
             'pool': { 'number': 0 },
-            'osd': { 'up': 0, 'in': 0, 'down': 0, 'out': 0} 
+            'osd': { 'up': 0, 'in': 0, 'down': 0, 'out': 0}
         } }
         output = None
         try:
-            output = subprocess.check_output('ceph osd dump --format json', shell=True)
+            output = subprocess.check_output('ceph --cluster %s osd dump --format json' % (self.cluster), shell=True)
         except Exception as exc:
             collectd.error("ceph-osd: failed to ceph osd dump :: %s :: %s"
                     % (exc, traceback.format_exc()))
@@ -86,7 +86,7 @@ class CephOsdPlugin(base.Base):
                 osd_data['in'] += 1
             else:
                 osd_data['out'] += 1
-    
+
         return data
 
 try:
