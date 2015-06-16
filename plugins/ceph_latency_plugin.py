@@ -51,7 +51,7 @@ class CephLatencyPlugin(base.Base):
         output = None
         try:
             output = subprocess.check_output(
-              "timeout 30s rados -p %s bench 10 write -t 1 -b 65536 2>/dev/null | grep -i latency | awk '{print 1000*$3}'" % (self.testpool), shell=True)
+              "timeout 30s rados --cluster %s -p %s bench 10 write -t 1 -b 65536 2>/dev/null | grep -i latency | awk '{print 1000*$3}'" % (self.cluster, self.testpool), shell=True)
         except Exception as exc:
             collectd.error("ceph-latency: failed to run rados bench :: %s :: %s"
                     % (exc, traceback.format_exc()))
