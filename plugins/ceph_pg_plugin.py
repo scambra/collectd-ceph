@@ -85,11 +85,15 @@ class CephPGPlugin(base.Base):
             data[ceph_cluster][osd_id]['commit_latency_ms'] = osd['fs_perf_stat']['commit_latency_ms']
 
         data[ceph_cluster]['cluster'] = {}
-        data[ceph_cluster]['cluster']['read_bytes_sec'] = json_status_data['pgmap']['read_bytes_sec']
-        data[ceph_cluster]['cluster']['write_bytes_sec'] = json_status_data['pgmap']['write_bytes_sec']
-        data[ceph_cluster]['cluster']['op_per_sec'] = json_status_data['pgmap']['op_per_sec']
+        if json_status_data['pgmap'].has_key('read_bytes_sec'):
+            data[ceph_cluster]['cluster']['read_bytes_sec'] = json_status_data['pgmap']['read_bytes_sec']
+        if json_status_data['pgmap'].has_key('write_bytes_sec'):
+            data[ceph_cluster]['cluster']['write_bytes_sec'] = json_status_data['pgmap']['write_bytes_sec']
+        if json_status_data['pgmap'].has_key('op_per_sec'):
+            data[ceph_cluster]['cluster']['op_per_sec'] = json_status_data['pgmap']['op_per_sec']
         if json_status_data['pgmap'].has_key('recovering_objects_per_sec'):
             data[ceph_cluster]['cluster']['recovering_objects'] = json_status_data['pgmap']['recovering_objects_per_sec']
+        if json_status_data['pgmap'].has_key('recovering_bytes_per_sec'):
             data[ceph_cluster]['cluster']['recovering_bytes'] = json_status_data['pgmap']['recovering_bytes_per_sec']
 
         if json_status_data['health'].has_key('summary'):
