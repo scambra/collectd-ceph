@@ -31,6 +31,7 @@ import collectd
 import json
 import traceback
 import subprocess
+import re
 
 import base
 
@@ -49,6 +50,7 @@ class CephPGPlugin(base.Base):
         output = None
         try:
             output = subprocess.check_output('ceph pg dump --format json', shell=True)
+            status_output = subprocess.check_output('ceph status --format json', shell=True)
         except Exception as exc:
             collectd.error("ceph-pg: failed to ceph pg dump :: %s :: %s"
                     % (exc, traceback.format_exc()))
@@ -57,7 +59,11 @@ class CephPGPlugin(base.Base):
         if output is None:
             collectd.error('ceph-pg: failed to ceph osd dump :: output was None')
 
+        if status_output is None:
+            collectd.error('ceph-pg: failed to ceph status :: output was None')
+
         json_data = json.loads(output)
+        json_status_data = json.loads(status_output)
 
         pg_data = data[ceph_cluster]['pg']
         # number of pgs in each possible state
@@ -66,7 +72,7 @@ class CephPGPlugin(base.Base):
                 if not pg_data.has_key(state):
                     pg_data[state] = 0
                 pg_data[state] += 1
-    
+
         # osd perf data
         for osd in json_data['osd_stats']:
             osd_id = "osd-%s" % osd['osd']
@@ -77,6 +83,19 @@ class CephPGPlugin(base.Base):
             data[ceph_cluster][osd_id]['num_snap_trimming'] = osd['num_snap_trimming']
             data[ceph_cluster][osd_id]['apply_latency_ms'] = osd['fs_perf_stat']['apply_latency_ms']
             data[ceph_cluster][osd_id]['commit_latency_ms'] = osd['fs_perf_stat']['commit_latency_ms']
+
+        data[ceph_cluster]['cluster'] = {}
+        data[ceph_cluster]['cluster']['read_bytes_sec'] = json_status_data['pgmap']['read_bytes_sec']
+        data[ceph_cluster]['cluster']['write_bytes_sec'] = json_status_data['pgmap']['write_bytes_sec']
+        data[ceph_cluster]['cluster']['op_per_sec'] = json_status_data['pgmap']['op_per_sec']
+        if json_status_data['pgmap'].has_key('recovering_objects_per_sec'):
+            data[ceph_cluster]['cluster']['recovering_objects'] = json_status_data['pgmap']['recovering_objects_per_sec']
+            data[ceph_cluster]['cluster']['recovering_bytes'] = json_status_data['pgmap']['recovering_bytes_per_sec']
+
+        if json_status_data['health'].has_key('summary'):
+            for summary in json_status_data['health']['summary']:
+                if re.search('\d+ requests are blocked', summary['summary']):
+                    data[ceph_cluster]['cluster']['slow_requests'] = int(re.findall('^\d+', summary['summary'])[0])
 
         return data
 
