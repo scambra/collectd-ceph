@@ -87,15 +87,26 @@ class CephPGPlugin(base.Base):
         data[ceph_cluster]['cluster'] = {}
         if json_status_data['pgmap'].has_key('read_bytes_sec'):
             data[ceph_cluster]['cluster']['read_bytes_sec'] = json_status_data['pgmap']['read_bytes_sec']
+        else:
+            data[ceph_cluster]['cluster']['read_bytes_sec'] = 0
         if json_status_data['pgmap'].has_key('write_bytes_sec'):
             data[ceph_cluster]['cluster']['write_bytes_sec'] = json_status_data['pgmap']['write_bytes_sec']
+        else:
+            data[ceph_cluster]['cluster']['writes_bytes_sec'] = 0
         if json_status_data['pgmap'].has_key('op_per_sec'):
             data[ceph_cluster]['cluster']['op_per_sec'] = json_status_data['pgmap']['op_per_sec']
+        else:
+            data[ceph_cluster]['cluster']['op_per_sec'] = 0
         if json_status_data['pgmap'].has_key('recovering_objects_per_sec'):
             data[ceph_cluster]['cluster']['recovering_objects'] = json_status_data['pgmap']['recovering_objects_per_sec']
+        else:
+            data[ceph_cluster]['cluster']['recovering_objects'] = 0
         if json_status_data['pgmap'].has_key('recovering_bytes_per_sec'):
             data[ceph_cluster]['cluster']['recovering_bytes'] = json_status_data['pgmap']['recovering_bytes_per_sec']
+        else:
+            data[ceph_cluster]['cluster']['recovering_bytes'] = 0
 
+        data[ceph_cluster]['cluster']['slow_requests'] = 0
         if json_status_data['health'].has_key('summary'):
             for summary in json_status_data['health']['summary']:
                 if re.search('\d+ requests are blocked', summary['summary']):
